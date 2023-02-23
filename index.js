@@ -28,7 +28,7 @@ setInterval(()=>{
     var date =new Date()
     var time =date.getMinutes()
 var minute=[0,15,30,45]
-
+console.log(time)
 if(minute.includes(time)){
     strategy(1)
     // strategy(2)
