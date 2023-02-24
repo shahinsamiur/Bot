@@ -44,50 +44,57 @@ console.log(i)
 
 
 
-try {
-    const EMA21Raw=await fetch(`https://api.twelvedata.com/ema?symbol=${pairs[i]}&time_period=21&outputsize=30&interval=15min&apikey=${APIKEY}`)
-    const EMA50Raw=await fetch(`https://api.twelvedata.com/ema?symbol=${pairs[i]}&time_period=50&outputsize=30&interval=15min&apikey=${APIKEY}`)
-    var EMA21=await EMA21Raw.json()
-    var EMA50=await EMA50Raw.json()
+
+    // const EMA21Raw=await fetch(`https://api.twelvedata.com/ema?symbol=${pairs[i]}&time_period=21&outputsize=30&interval=15min&apikey=${APIKEY}`)
+    // const EMA50Raw=await fetch(`https://api.twelvedata.com/ema?symbol=${pairs[i]}&time_period=50&outputsize=30&interval=15min&apikey=${APIKEY}`)
+    // var EMA21=await EMA21Raw.json()
+    // var EMA50=await EMA50Raw.json()
+    var result=await fetch("https://api.twelvedata.com/ema?symbol=EUR/USD&interval=15min&outputsize=30&apikey=b6a6ccc6dcac4805ad1e336d86cef9d7")
+    var reslts=await result.json()
+console.log(reslts)
  //   const EMA21Raw=await fetch(`https://api.twelvedata.com/time_series?symbol=EUR/USD&interval=15min&outputsize=50&apikey=b6a6ccc6dcac4805ad1e336d86cef9d7`)
  
     // console.log(EMA50)
     // console.log(EMA21Raw)
     // console.log(EMA21.values[0].ema,"sss",EMA21.values[1].ema,"sss",EMA50.values[0].ema)
-} catch (error) {
+
     // console.error(error);
-  }
+
 
       
-    if(EMA21.values[0].ema > EMA21.values[1].ema&& EMA21.values[0].ema > EMA50.values[0].ema){
-         trend="up"
-}else if(EMA21.values[0].ema < EMA21.values[1].ema&& EMA21.values[0].ema < EMA50.values[0].ema)
-    {
-     trend="down"
-    } 
-    else{ trend="sideways"}
+//     if(EMA21.values[0].ema > EMA21.values[1].ema&& EMA21.values[0].ema > EMA50.values[0].ema){
+//          trend="up"
+//          console.log("up")
+// }else if(EMA21.values[0].ema < EMA21.values[1].ema&& EMA21.values[0].ema < EMA50.values[0].ema)
+//     {
+//      trend="down"
+//      console.log("down")
+//     } 
+//     else{ trend="sideways"
+//     console.log("sideways")
+// }
 
 //0.68695 21-0
 //0.68703 21-1
 //0.68774 50-0
    
 
-const PrevTrand=await model.findOne({Pair:pairs[i]})
+// const PrevTrand=await model.findOne({Pair:pairs[i]})
 
 
-if(trend!="sideways" &&PrevTrand!={}&&PrevTrand.Trend!=trend){
+// if(trend!="sideways" &&PrevTrand!={}&&PrevTrand.Trend!=trend){
 
-//    var SLandTP=await AtrStopLossAndTakeProfit()
+// //    var SLandTP=await AtrStopLossAndTakeProfit()
 
-await MakeEmail(pairs[i],EMA21.values[0].ema)
-//    OpenTrade(pairs[i],SLandTP)
+// await MakeEmail(pairs[i],EMA21.values[0].ema)
+// //    OpenTrade(pairs[i],SLandTP)
    
  
 
-    // MakeEmail(pairs[i],EMA21.values[0].ema)
-   const finaldata =await model.updateOne({Pair:pairs[i]},{Trend:trend})
+//     // MakeEmail(pairs[i],EMA21.values[0].ema)
+//    const finaldata =await model.updateOne({Pair:pairs[i]},{Trend:trend})
 
-}
+// }
 
 
 
