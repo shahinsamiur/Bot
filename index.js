@@ -7,7 +7,7 @@ const DotEnv=require("dotenv").config()
 const DB_Pass=process.env.DB_Pass
 const DB_UserName=process.env.DB_UserName
 const Port=process.env.Port||404
-const fetch = require('node-fetch');
+const fetch = import('node-fetch').then(mod => mod.default);
 // console.log(`mongodb+srv://${DB_UserName}:${DB_Pass}@cluster0.4d1qqmy.mongodb.net/?retryWrites=true&w=majority`)
 mongoose.set("strictQuery", false);
 mongoose.connect(`mongodb+srv://${DB_UserName}:${DB_Pass}@cluster0.4d1qqmy.mongodb.net/?retryWrites=true&w=majority`)
