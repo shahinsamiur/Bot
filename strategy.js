@@ -8,7 +8,7 @@
 
 
 
-
+const fetch = require('node-fetch');
 var pairs=["EUR/USD","USD/JPY","GBP/USD"]
 const DotEnv=require("dotenv").config()
 const APIKEY1=process.env.APIKEY
