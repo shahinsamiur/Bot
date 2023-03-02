@@ -1,9 +1,11 @@
 
-const LotCalculate=async(userBlance=100,SL)=>{
+const LotCalculate=async(SL,close)=>{
 //calculate risk amount (2%)
+//userBlanceData,
+var userBlance=100
 var riskBlance=userBlance/50  //2
 // calculate  SL pips //20
-pips=2
+
 
 
 var lotSize=riskBlance/(pips*10)

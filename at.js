@@ -1,5 +1,3 @@
-
-
 function getATRStopLossLevels(close, high, low, length = 14, smoothing = "RMA", m = 1.5) {
     function rma(source, length) {
       let sum = 0.0
@@ -65,13 +63,50 @@ function getATRStopLossLevels(close, high, low, length = 14, smoothing = "RMA", 
       long: longLevels.join(","),
       short: shortLevels.join(","),
     }
-
     const result = {
         long: output.long.split(',').map(Number),
         short: output.short.split(',').map(Number)
       };
-
     return result
   }
-
-module.exports=getATRStopLossLevels
+  
+  
+  const close = [
+    1.05438, 1.05443,
+    1.05447, 1.05444,
+    1.05458, 1.0549,
+    1.05472, 1.05414,
+    1.05414, 1.054305,   1.05438, 1.05443,
+    1.05447, 1.05444,
+    1.05458, 1.0549,
+    1.05472, 1.05414,
+    1.05414, 1.054305
+  ];
+  
+  const high = [
+    1.05464, 1.0546,
+    1.05482, 1.0546,
+    1.05474, 1.05494,
+    1.05508, 1.05482,
+    1.05432, 1.054305, 1.05464, 1.0546,
+    1.05482, 1.0546,
+    1.05474, 1.05494,
+    1.05508, 1.05482,
+    1.05432, 1.054305
+  ];
+  
+  const low = [
+    1.05399, 1.05433,
+    1.05434, 1.05438,
+    1.05442, 1.05453,
+    1.05467, 1.05402,
+    1.05402, 1.05402, 1.05464, 1.0546,
+    1.05482, 1.0546,
+    1.05474, 1.05494,
+    1.05508, 1.05482,
+    1.05432, 1.054305
+  ];
+  
+  const result = getATRStopLossLevels(close,high, low, 14, "RMA", 1.5);
+  console.log(result);
+  

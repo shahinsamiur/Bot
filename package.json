@@ -13,9 +13,9 @@
     "dotenv": "^16.0.3",
     "express": "^4.18.2",
     "mongoose": "^6.9.2",
-    "moving-averages-js": "^0.0.3",
-    "node-fetch": "^3.3.0",
     "nodemailer": "^6.9.1",
-    "nodemon": "^2.0.20"
+    "nodemon": "^2.0.20",
+    "python-shell": "^5.0.0",
+    "technicalindicators": "^3.1.0"
   }
 }
