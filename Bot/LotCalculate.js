@@ -1,21 +1,39 @@
+const LotCalculate=async(userBlance,currentPrice,SLandTP,signal)=>{
 
-const LotCalculate=async(SL,close)=>{
-//calculate risk amount (2%)
-//userBlanceData,
-var userBlance=100
-var riskBlance=userBlance/50  //2
-// calculate  SL pips //20
-
-
-
-var lotSize=riskBlance/(pips*10)
-// ***probably Problem 
-if(lotSize<0.01){
-    var lotSize=0.01
-    return lotSize
-}
-
-return lotSize
-}
+    var riskAmount=userBlance/50
+    
+    //pips calculation 
+    var pips=0
+    var riskPrice=0
+    var TP=0
+    if (signal=="buy") {
+        riskPrice= (currentPrice-SLandTP.short)
+        TP=currentPrice+(riskPrice*2)
+        pips=(Math.abs(( SLandTP.short-currentPrice)/0.0001)).toFixed(2)
+    
+    //  pips=Math.round((currentPrice-riskPrice)/ 0.0001)
+    } else {
+        riskPrice= SLandTP.long-currentPrice
+        TP=currentPrice-(riskPrice*2)
+        pips=(Math.abs(( SLandTP.long-currentPrice)/0.0001)).toFixed(2)
+    }
+    
+    
+    // lot size calculation 
+    var lotSize=(riskAmount/(pips*10)).toFixed(2)
+    
+    
+    
+    console.log(lotSize)
+    
+    if(lotSize<=0.01){
+        
+        return {
+            lotSize,TP
+        }
+    }
+    console.log(lotSize)
+    return false
+    }
 
 module.exports=LotCalculate;
