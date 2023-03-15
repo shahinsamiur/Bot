@@ -1,32 +1,24 @@
 
 const {PythonShell}=require("python-shell")
-
-
 const DotEnv=require("dotenv").config()
 const MakeEmail=require("./Middlewares/MaleEmail")
 const AtrStopLossAndTakeProfit=require("./Bot/AtrStopLossAndTakeProfit")
- const ema=require("./ema")
+const ema=require("./ema")
 const OpenTrade=require("./Bot/OpenTrade")
-const CalculateLotSize=require("./Bot/LotCalculate")
 const fs = require('fs');
 const pythoncallfunc=require("./Middlewares/pythoncallfunc")
-const dd=require("./Bot/PDB/treand.json")
 const checkCloseTrade=require("./Middlewares/checkCloseTrade")
 
 const Strategy=async()=>{
-  var pairs=["EURUSD","USDJPY","GBPUSD","AUDUSD","USDCAD","EURGBP"]
-  var pairsForPython=["EUR/USD","USD/JPY","GBP/USD","AUD/USD","USD/CAD","EUR/GBP"]
+  var pairs=["EURUSD","USDJPY","GBPUSD","AUDUSD","USDCAD",]
+  var pairsForPython=["EUR/USD","USD/JPY","GBP/USD","AUD/USD","USD/CAD",]
 
     var trend=''
-for ( i = 4; i <pairs.length; i++) {
+for ( i = 3; i <pairs.length; i++) {
 console.log(i)
 const candleDataRaw=await pythoncallfunc(pairs[i])
-
-
 var output=await JSON.parse(candleDataRaw)
-console.log("data Got ",output)
-
-
+// console.log("data Got ",output)
 
 
   const EMA21=await ema(output.close,21)
@@ -49,10 +41,17 @@ console.log("ema's got " )
 
 const jsonData = fs.readFileSync('./Bot/PDB/treand.json', 'utf8');
 const PrevTrand = JSON.parse(jsonData)
-console.log(PrevTrand)
+console.log(PrevTrand[i].treand)
+PrevTrand[i].treand=trend
+console.log(PrevTrand[i])
+
+if(trend!="sideways" &&PrevTrand!={}&&PrevTrand[i].treand!=trend&&PrevTrand[i].treand!="sideways"){
 
 
-if(trend!="sideways" &&PrevTrand!={}&&PrevTrand.treand!=trend){
+// PrevTrand[i]=
+// fs.writeFileSync("./Bot/PDB/treand.json", modifiedJsonData);
+
+
 
 
   const EMA211H=await ema(output.close1H,21)
@@ -77,33 +76,34 @@ var trend1H=""
   var SLandTP=await AtrStopLossAndTakeProfit(output.close,output.high, output.low, 14, "RMA", 1.5)
   console.log(SLandTP.long[70],SLandTP.short[70])
 
+//---------------------------------------------------------------------------------------------------------
+//---------------------------------------------------------------------------------------------------------
+
+
+
 
 
 // await MakeEmail(pairs[i],EMA21.values[0].ema)
 
 // check any trade is open in this pair ?
+
+
+
 // console.log("let's open a trede ")
 
-// await OpenTrade(pairs[i],SLandTP,output.close[output.close.length-2],trend)
+// await OpenTrade(pairsForPython[i],SLandTP,output.close[output.close.length-2],trend)
 // console.log("trade Opend ")
 
 const jsonData = fs.readFileSync('./Bot/PDB/openTrade.json', 'utf8');
 const OpenTradePair = JSON.parse(jsonData)
 
-  console.log("checking")
+  // console.log("checking")
 
   if(OpenTradePair[i].pair==pairs[i]&&OpenTradePair[i].isTradeOpen==false){
    var OrderId= await OpenTrade(pairsForPython[i],SLandTP,output.close[output.close.length-2],trend)
 console.log(OrderId)
 
-     //
-    //  OpenTradePair[i]={
-    //   pair:"EURUSD",
-    //   isTradeOpen:true,
-    //   SL:SL,
-    //   TP:"",
-    //   type:""
-// }
+
 const modifiedJsonDataOfPairsTrade = JSON.stringify(OpenTradePair);
 fs.writeFileSync("./Bot/PDB/treand.json", modifiedJsonDataOfPairsTrade);
 
@@ -122,8 +122,9 @@ fs.writeFileSync("./Bot/PDB/treand.json", modifiedJsonDataOfPairsTrade);
 
 
   OpenTradePair[i].treand =trend;
+  console.log(OpenTradePair)
 const modifiedJsonData = JSON.stringify(PrevTrand);
-fs.writeFileSync("./Bot/PDB/treand.json", modifiedJsonData);
+await fs.writeFileSync("./Bot/PDB/treand.json", modifiedJsonData);
 
 
 

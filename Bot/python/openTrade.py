@@ -10,11 +10,18 @@ lotSize = float(sys.argv[3])
 TP = float(sys.argv[4])
 signal=sys.argv[5]
 token=sys.argv[6]
-print((pair,SL,lotSize,TP,signal,token))
+
+if signal=='true':
+    signal=True
+else:
+    signal=False
+# PL="121.343"
+# print((pair,SL,lotSize,TP,signal,token))
 con=fxcmpy.fxcmpy(access_token=token,log_level="error",log_file=None)
-def on_tick(data,df):
+def on_tick():
     TradeAmount=lotSize*100
-    order=con.open_trade(symbol=pair, is_buy=True, amount=TradeAmount, time_in_force='GTC', order_type='AtMarket', rate=0, is_in_pips=False, limit=TP, at_market=0, stop=SL, trailing_step=None, account_id=None)
+    # print(pair,SL,lotSize,TP,signal)
+    order=con.open_trade(symbol=pair, is_buy=signal, amount=TradeAmount, time_in_force='GTC', order_type='AtMarket', rate=0, is_in_pips=False, limit=TP, at_market=0, stop=SL, trailing_step=None, account_id=None)
     print(order)
 
 # symbol = 'EUR/USD'

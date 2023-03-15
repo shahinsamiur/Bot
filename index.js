@@ -38,8 +38,6 @@ strategy()
 // },60000)
 
 
-
-
 app.listen(Port,()=>{
     console.log("our server is runing ")
 })

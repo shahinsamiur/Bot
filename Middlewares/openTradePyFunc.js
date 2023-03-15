@@ -2,8 +2,11 @@
 const { spawn } = require('child_process');
 
 function runPythonScript(pair,SL,lotSize,TP,signal,token) {
-
-
+console.log("pair",pair)
+console.log("SL",SL)
+console.log("lotSize",lotSize)
+console.log("signal",signal)
+console.log(pair,SL,lotSize,TP,signal,token)
     return new Promise(async(resolve, reject) => {
       const pythonProcess = spawn('python', ['./Bot/python/openTrade.py',pair,SL,lotSize,TP,signal,token]);
   
@@ -11,6 +14,7 @@ function runPythonScript(pair,SL,lotSize,TP,signal,token) {
       pythonProcess.stdout.on('data', async(data) => {
         // console.log(`stdout: ${data}`);
         datas +=await data.toString();
+        console.log("reply data ",datas)
         resolve(datas)
       });
   
