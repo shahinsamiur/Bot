@@ -1,34 +1,8 @@
-
 [
-    {"pair":"EURUSD",
-    "isTradeOpen":false,
-    "SL":"",
-    "TP":"",
-    "type":""
-    },
-    {"pair":"USDJPY",
-     "isTradeOpen":false,
-     "SL":"",
-     "TP":"",
-     "type":""
-    },
-    {"pair":"GBPUSD",
-     "isTradeOpen":false,
-     "SL":"",
-     "TP":"",
-     "type":""
-    },
-    {"pair":"EURUSD",
-     "isTradeOpen":false,
-     "SL":"",
-     "TP":"",
-     "type":""
-    },
-    {"pair":"EURUSD",
-     "isTradeOpen":false,
-     "SL":"",
-     "TP":"",
-     "type":""
-    }
-    ]
-    
+  { "pair": "BTCUSDT", "isTradeOpen": false, "SL": "", "TP": "", "type": "" },
+  { "pair": "ETHUSDT", "isTradeOpen": false, "SL": "", "TP": "", "type": "" },
+  { "pair": "MATICUSDT", "isTradeOpen": false, "SL": "", "TP": "", "type": "" },
+  { "pair": "XRPUSDT", "isTradeOpen": false, "SL": "", "TP": "", "type": "" },
+  { "pair": "APTUSDT", "isTradeOpen": false, "SL": "", "TP": "", "type": "" },
+  { "pair": "KAVAUSDT", "isTradeOpen": false, "SL": "", "TP": "", "type": "" }
+]

@@ -1,10 +1,3 @@
-const checkCloseTrade=(high,close,Sl,TP)=>{
+const checkCloseTrade = (high, close, Sl, TP) => {};
 
-
-
-
-
-
-}
-
-module.exports=checkCloseTrade;
+module.exports = checkCloseTrade;

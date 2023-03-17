@@ -1,12 +1,8 @@
+const mongoose = require("mongoose");
 
-const mongoose=require("mongoose")
+const TradeSchema = new mongoose.Schema({
+  Pair: String,
+  Trend: String,
+});
 
-
-
-const TradeSchema=new mongoose.Schema({
-Pair:String,
-Trend:String
-})
-
-
-module.exports=TradeSchema;
+module.exports = TradeSchema;
