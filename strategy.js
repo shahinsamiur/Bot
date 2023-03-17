@@ -9,14 +9,24 @@ const pythoncallfunc = require("./Middlewares/pythoncallfunc");
 const checkCloseTrade = require("./Middlewares/checkCloseTrade");
 const dd = require("./Bot/PDB/treand.json");
 const Strategy = async () => {
-  var pairs = ["BTCUSDT", "ETHUSDT", "MATICUSDT", "XRPUSDT", "APTUSDT","KAVAUSDT"];
+  var pairs = [
+    "BTCUSDT",
+    "ETHUSDT",
+    "MATICUSDT",
+    "XRPUSDT",
+    "APTUSDT",
+    "KAVAUSDT",
+  ];
   var pairsForPython = ["EUR/USD", "USD/JPY", "GBP/USD", "AUD/USD", "USD/CAD"];
 
   var trend = "";
+  var SLandTP={}
   for (i = 0; i < pairs.length; i++) {
     console.log(i);
     const candleDataRaw = await pythoncallfunc(pairs[i]);
     var output = await JSON.parse(candleDataRaw);
+    console.log(output.high.length);
+
 
     const EMA21 = await ema(output.close, 21);
     const EMA50 = await ema(output.close, 50);
@@ -37,7 +47,7 @@ const Strategy = async () => {
     const PrevTrand = JSON.parse(jsonData);
     // console.log(PrevTrand[i].treand)
     // PrevTrand[i].treand = trend;
-    console.log(PrevTrand[i])
+    console.log(PrevTrand[i]);
 
     if (
       trend != "sideways" &&
@@ -70,7 +80,7 @@ const Strategy = async () => {
       }
 
       if (trend1H == "sideways" || trend1H == trend) {
-        var SLandTP = await AtrStopLossAndTakeProfit(
+         SLandTP = await AtrStopLossAndTakeProfit(
           output.close,
           output.high,
           output.low,
@@ -82,8 +92,45 @@ const Strategy = async () => {
 
         //---------------------------------------------------------------------------------------------------------
         //---------------------------------------------------------------------------------------------------------
+var TredeOpened=false
 
-        // await MakeEmail(pairs[i],EMA21.values[0].ema)
+
+
+        const openTradeData = fs.readFileSync(
+          "./Bot/PDB/openTrade.json",
+          "utf8"
+        );
+        const openTradeDataJson = JSON.parse(openTradeData);
+
+        if (openTradeDataJson[i].isTradeOpen == true) {
+          var istradeOpen = await checkCloseTrade(
+            output.high[output.high.length - 2],
+            output.low[output.low.length - 2],
+            openTradeDataJson[i].SL,
+            openTradeDataJson[i].TP,
+            openTradeDataJson[i].type
+          );
+
+          if (istradeOpen == false) {
+            if(trend=="up")  await MakeEmail(pairs[i],trend, SLandTP.short[70],output.close[71]);
+            if(trend=="down")  await MakeEmail(pairs[i],trend, SLandTP.long[70],output.close[71]);
+            TredeOpened=true
+          }
+        } else {
+          // console.log("test",pairs[i],trend, SLandTP)
+          if(trend=="up")  await MakeEmail(pairs[i],trend, SLandTP.short[70],output.close[71]);
+          if(trend=="down")  await MakeEmail(pairs[i],trend, SLandTP.long[70],output.close[71]);
+          // await MakeEmail(pairs[i],trend, SLandTP[70]);
+          TredeOpened=true
+        }
+
+        if( TredeOpened=true){
+          var newOrderForSave=openTradeDataJson
+          newOrderForSave[i].isTradeOpen=true
+          newOrderForSave[i].SL=0,
+          newOrderForSave[i].TP=0
+          newOrderForSave[i].type=trend
+        }
 
         // check any trade is open in this pair ?
 
@@ -101,13 +148,13 @@ const Strategy = async () => {
           OpenTradePair[i].pair == pairs[i] &&
           OpenTradePair[i].isTradeOpen == false
         ) {
-          var OrderId = await OpenTrade(
-            pairsForPython[i],
-            SLandTP,
-            output.close[output.close.length - 2],
-            trend
-          );
-          console.log(OrderId);
+          // var OrderId = await OpenTrade(
+          //   pairsForPython[i],
+          //   SLandTP,
+          //   output.close[output.close.length - 2],
+          //   trend
+          // );
+          // console.log(OrderId);
 
           // const modifiedJsonDataOfPairsTrade = JSON.stringify(OpenTradePair);
           // fs.writeFileSync("./Bot/PDB/treand.json", modifiedJsonDataOfPairsTrade);
@@ -136,8 +183,8 @@ const Strategy = async () => {
       TrendData[i].treand = trend;
       var modifiedJsonData = JSON.stringify(TrendData);
       fs.writeFileSync("./Bot/PDB/treand.json", modifiedJsonData);
-    }else{
-      console.log("hellow world ")
+    } else {
+      console.log("we don't need to update trend ");
     }
   }
 };
