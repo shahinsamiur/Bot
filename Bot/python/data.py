@@ -11,8 +11,8 @@ def greet():
     password = 'SrS.shahin2020'
     # username, password
     tv = TvDatafeed()
-    data = tv.get_hist(symbol=arg1, exchange='BINANCE', interval=Interval.in_15_minute, n_bars=72)
-    data1H = tv.get_hist(symbol=arg1, exchange='BINANCE', interval=Interval.in_1_hour, n_bars=72)
+    data = tv.get_hist(symbol=arg1, exchange='OANDA', interval=Interval.in_1_minute, n_bars=72)
+    data1H = tv.get_hist(symbol=arg1, exchange='OANDA', interval=Interval.in_5_minute, n_bars=72)
 #     print(data)
     close = data.iloc[:, 4].values.tolist()
     high = data.iloc[:, 2].values.tolist()

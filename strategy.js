@@ -7,29 +7,27 @@ const OpenTrade = require("./Bot/OpenTrade");
 const fs = require("fs");
 const pythoncallfunc = require("./Middlewares/pythoncallfunc");
 const checkCloseTrade = require("./Middlewares/checkCloseTrade");
-const dd = require("./Bot/PDB/treand.json");
+// const dd = require("./Bot/PDB/treand.json");
 const Strategy = async () => {
   var pairs = [
-    "BTCUSDT",
-    "ETHUSDT",
-    "MATICUSDT",
-    "XRPUSDT",
-    "APTUSDT",
-    "KAVAUSDT",
+    "EURUSD", "USDJPY", "GBPUSD", "AUDUSD", "USDCAD"
   ];
   var pairsForPython = ["EUR/USD", "USD/JPY", "GBP/USD", "AUD/USD", "USD/CAD"];
 
   var trend = "";
   var SLandTP={}
+  var  candleDataRaw
   for (i = 0; i < pairs.length; i++) {
-    console.log(i);
-    const candleDataRaw = await pythoncallfunc(pairs[i]);
+   try {
+     candleDataRaw = await pythoncallfunc(pairs[i]);
+  
+   
     var output = await JSON.parse(candleDataRaw);
-    console.log(output.high.length);
+    // console.log(output.high.length);
 
 
-    const EMA21 = await ema(output.close, 21);
-    const EMA50 = await ema(output.close, 50);
+    const EMA21 = await ema(output.close, 7);
+    const EMA50 = await ema(output.close, 21);
     // console.log("ema's got ");
 
     if (EMA21[0] > EMA21[1] && EMA21[0] > EMA50[0]) {
@@ -56,8 +54,8 @@ const Strategy = async () => {
       PrevTrand[i].treand != "sideways"
     ) {
       var TrendData = PrevTrand;
-      console.log("sas", 1);
-      console.log(TrendData);
+      // console.log("sas", 1);
+      // console.log(TrendData);
       TrendData[0].treand = "UP";
       var modifiedJsonData = JSON.stringify(TrendData);
       fs.writeFileSync("./Bot/PDB/treand.json", modifiedJsonData);
@@ -70,13 +68,13 @@ const Strategy = async () => {
       var trend1H = "";
       if (EMA211H[0] > EMA211H[1] && EMA211H[0] > EMA501H[0]) {
         trend1H = "up";
-        console.log("up_1h");
+        console.log("up_5min");
       } else if (EMA211H[0] < EMA211H[1] && EMA211H[0] < EMA501H[0]) {
         trend1H = "down";
-        console.log("down_1H");
+        console.log("down_5min");
       } else {
         trend1H = "sideways";
-        console.log("sideways_1h");
+        console.log("sideways_5min");
       }
 
       if (trend1H == "sideways" || trend1H == trend) {
@@ -88,104 +86,22 @@ const Strategy = async () => {
           "RMA",
           1.5
         );
-        console.log(SLandTP.long[70], SLandTP.short[70]);
-
+      
+         }
         //---------------------------------------------------------------------------------------------------------
         //---------------------------------------------------------------------------------------------------------
-var TredeOpened=false
 
-
-
-        const openTradeData = fs.readFileSync(
-          "./Bot/PDB/openTrade.json",
-          "utf8"
-        );
-        const openTradeDataJson = JSON.parse(openTradeData);
-
-        if (openTradeDataJson[i].isTradeOpen == true) {
-          var istradeOpen = await checkCloseTrade(
-            output.high[output.high.length - 2],
-            output.low[output.low.length - 2],
-            openTradeDataJson[i].SL,
-            openTradeDataJson[i].TP,
-            openTradeDataJson[i].type
-          );
-
-          if (istradeOpen == false) {
-            if(trend=="up")  await MakeEmail(pairs[i],trend, SLandTP.short[70],output.close[71]);
-            if(trend=="down")  await MakeEmail(pairs[i],trend, SLandTP.long[70],output.close[71]);
-            TredeOpened=true
-          }
-        } else {
-          // console.log("test",pairs[i],trend, SLandTP)
-          if(trend=="up")  await MakeEmail(pairs[i],trend, SLandTP.short[70],output.close[71]);
-          if(trend=="down")  await MakeEmail(pairs[i],trend, SLandTP.long[70],output.close[71]);
-          // await MakeEmail(pairs[i],trend, SLandTP[70]);
-          TredeOpened=true
-        }
-
-        if( TredeOpened=true){
-          var newOrderForSave=openTradeDataJson
-          newOrderForSave[i].isTradeOpen=true
-          newOrderForSave[i].SL=0,
-          newOrderForSave[i].TP=0
-          newOrderForSave[i].type=trend
-        }
-
-        // check any trade is open in this pair ?
-
-        // console.log("let's open a trede ")
-
-        // await OpenTrade(pairsForPython[i],SLandTP,output.close[output.close.length-2],trend)
-        // console.log("trade Opend ")
-
-        const jsonData = fs.readFileSync("./Bot/PDB/openTrade.json", "utf8");
-        const OpenTradePair = JSON.parse(jsonData);
-
-        // console.log("checking")
-
-        if (
-          OpenTradePair[i].pair == pairs[i] &&
-          OpenTradePair[i].isTradeOpen == false
-        ) {
-          // var OrderId = await OpenTrade(
-          //   pairsForPython[i],
-          //   SLandTP,
-          //   output.close[output.close.length - 2],
-          //   trend
-          // );
-          // console.log(OrderId);
-
-          // const modifiedJsonDataOfPairsTrade = JSON.stringify(OpenTradePair);
-          // fs.writeFileSync("./Bot/PDB/treand.json", modifiedJsonDataOfPairsTrade);
-        } else {
-          console.log("sas", 2);
-          checkCloseTrade();
-        }
-
-        //  OpenTrade(pairsForPython[i],SLandTP,output.close[output.close.length-2],trend)
-
-        //   OpenTradePair[i].treand =trend;
-        //   console.log(OpenTradePair)
-        // const modifiedJsonData = JSON.stringify(PrevTrand);
-        // await fs.writeFileSync("./Bot/PDB/treand.json", modifiedJsonData);
-      }
-    } else if (
-      trend != "sideways" &&
-      PrevTrand != {} &&
-      PrevTrand[i].treand != trend
-    ) {
-      // check is trade close or not
-
-      var TrendData = PrevTrand;
-      console.log(TrendData);
-      console.log("sas", 2);
-      TrendData[i].treand = trend;
-      var modifiedJsonData = JSON.stringify(TrendData);
-      fs.writeFileSync("./Bot/PDB/treand.json", modifiedJsonData);
-    } else {
-      console.log("we don't need to update trend ");
+        // const LotSize=await LotCalculate(userBlance,currentPrice,SLandTP2,signal)
+        const LotSize=await LotCalculate(userBlance,output.close[output.close.length-2],SLandTP,trend)
+    if(LotSize){
+      await MakeEmail(pairs[i],trend,LotSize.riskPrice,output.close[output.close.length-2])
     }
+    
+    
+      }
+  } catch (error) {
+    console.log("not getting data ")
+   }
   }
 };
 module.exports = Strategy;
