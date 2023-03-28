@@ -29,14 +29,14 @@ setInterval(()=>{
     var time =date.getMinutes()
     var getSec=date.getSeconds
 var minute=[0,15,30,45]
-console.log(time)
+
 
 if(getSec==0){
     strategy()
     // strategy(3)
 }
 
-},60000)
+},1000)
 
 app.listen(Port, () => {
   console.log("our server is runing ");
