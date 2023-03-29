@@ -1,3 +1,4 @@
+
 const LotCalculate=async(userBlance,currentPrice,SLandTP,signal)=>{
 
     var riskAmount=userBlance/50
@@ -9,7 +10,7 @@ const LotCalculate=async(userBlance,currentPrice,SLandTP,signal)=>{
     var pips=0
     var riskPrice=0
     var TP=0
-    if (signal==true) {
+    if (signal=="up") {
         riskPrice= (currentPrice-SLandTP.short)
         // console.log("aa",riskPrice)
         TP=currentPrice+(riskPrice*2)
@@ -44,10 +45,10 @@ const LotCalculate=async(userBlance,currentPrice,SLandTP,signal)=>{
     }
 
 
-var lot={long: [0.6594964285714285],
-    short: [0.6569235714285714]
+var lot={long: [1.35769],
+    short: [1.35701]
 }
 
 
-    // LotCalculate(19998.86,0.65795,lot,true)
-module.exports=LotCalculate;
+    console.log(LotCalculate(100,1.35725,lot,"down"))
+// module.exports=LotCalculate;
