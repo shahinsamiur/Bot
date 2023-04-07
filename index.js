@@ -31,8 +31,8 @@ setInterval(()=>{
 var minute=[0,15,30,45]
 
 // console.log(getSec)
-if(getSec==0){
-  console.log("call")
+if(getSec==5){
+ console.log(time)
     strategy()
     // strategy(3)
 }

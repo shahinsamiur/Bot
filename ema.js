@@ -12,7 +12,7 @@ async function calculateEMA(price, periodof) {
   // Print the result
   var length = resultEMA.length;
 
-  var ReturnValue = [resultEMA[length - 2], resultEMA[length - 3]];
+  var ReturnValue = [resultEMA[length - 1], resultEMA[length - 2]];
   return ReturnValue;
 }
 

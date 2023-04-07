@@ -1,17 +1,15 @@
-const { PythonShell } = require("python-shell");
-const DotEnv = require("dotenv").config();
+
+
 const MakeEmail = require("./Middlewares/MaleEmail");
 const AtrStopLossAndTakeProfit = require("./Bot/AtrStopLossAndTakeProfit");
 const ema = require("./ema");
 const LotCalculate=require("./Bot/LotCalculate")
-const OpenTrade = require("./Bot/OpenTrade");
 const fs = require("fs");
 const pythoncallfunc = require("./Middlewares/pythoncallfunc");
 const checkCloseTrade = require("./Middlewares/checkCloseTrade");
-// const dd = require("./Bot/PDB/treand.json");
 const Strategy = async () => {
   var pairs = ["EURUSD", "USDJPY", "GBPUSD", "AUDUSD", "USDCAD"];
-  var pairsForPython = ["EUR/USD", "USD/JPY", "GBP/USD", "AUD/USD", "USD/CAD"];
+
 
   var trend = "";
 
@@ -23,9 +21,21 @@ const Strategy = async () => {
     try {
       candleDataRaw = await pythoncallfunc(pairs[i]);
       var output = await JSON.parse(candleDataRaw);
+      // console.log("last candle close -",output.close[output.close.length-1])
+      const EMA21 = await ema(output.close, 21);
+      const EMA50 = await ema(output.close, 50);
+      // console.log("EMA length",EMA21)
 
-      const EMA21 = await ema(output.close, 7);
-      const EMA50 = await ema(output.close, 21);
+      // SLandTP = await AtrStopLossAndTakeProfit(
+      //   output.close,
+      //   output.high,
+      //   output.low,
+      //   14,
+      //   "RMA",
+      //   1.5
+      // );
+
+      // console.log("atr SLandTP_long", SLandTP.long)
 
       if (EMA21[0] > EMA21[1] && EMA21[0] > EMA50[0]) {
         trend = "up";
@@ -55,16 +65,17 @@ const Strategy = async () => {
 
         const EMA211H = await ema(output.close1H, 21);
         const EMA501H = await ema(output.close1H, 50);
+      
         var trend1H = "";
         if (EMA211H[0] > EMA211H[1] && EMA211H[0] > EMA501H[0]) {
           trend1H = "up";
-          console.log("up_5min");
+          // console.log("up_5min");
         } else if (EMA211H[0] < EMA211H[1] && EMA211H[0] < EMA501H[0]) {
           trend1H = "down";
-          console.log("down_5min");
+          // console.log("down_5min");
         } else {
           trend1H = "sideways";
-          console.log("sideways_5min");
+          // console.log("sideways_5min");
         }
 
         if (trend1H == "sideways" || trend1H == trend) {
@@ -76,7 +87,8 @@ const Strategy = async () => {
             "RMA",
             1.5
           );
-        }
+          // console.log(SLandTP)
+      
         //---------------------------------------------------------------------------------------------------------
         //---------------------------------------------------------------------------------------------------------
 
@@ -84,19 +96,24 @@ const Strategy = async () => {
         var userBlance=100;
         const LotSize = await LotCalculate(
           userBlance,
-          output.close[output.close.length - 2],
+          output.close[output.close.length - 1],
           SLandTP,
           trend
         );
+        var time=new Date().getMinutes()
+        console.log(time)
         console.log(LotSize);
+        
         if (LotSize) {
           await MakeEmail(
             pairs[i],
             trend,
-            LotSize.riskPrice,
-            output.close[output.close.length - 2]
+            LotSize.SL,
+            LotSize.TP,
+            output.close[output.close.length - 1],
+           
           );
-        }
+        }  }
       } else if (
         trend != "sideways" &&
         PrevTrand != {} &&
