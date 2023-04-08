@@ -4,19 +4,7 @@ const MakeEmail = async (pair,trend, SL,TP,currentPrice) => {
   // Generate test SMTP service account from ethereal.email
   // Only needed if you don't have a real mail account for testing
   let testAccount = await nodemailer.createTestAccount();
-// var TP=0
-// if(trend=="up"){
-//   var risk=currentPrice-SL
-//   TP=currentPrice+(risk*2)
-// }else{
-//   var risk=SL-currentPrice
-//   TP=currentPrice-(risk*2)
-// }
 
-
-  //    host: "smtp.ethereal.email",
-  //   secure: false, // true for 465, false for other ports
-  // create reusable transporter object using the default SMTP transport
   const transporter = nodemailer.createTransport({
     host: "smtp.gmail.com",
     port: 465,
