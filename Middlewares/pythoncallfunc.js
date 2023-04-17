@@ -1,8 +1,4 @@
-// const { spawn } = require('child_process');
 
-// const pythonProcess = spawn('python', ['./Bot/python/data.py','hello samiur',"notthing "]);
-
-// getting candle data
 
 const { spawn } = require("child_process");
 
@@ -17,7 +13,7 @@ function runPythonScript(pair) {
 
     let datas = "";
     pythonProcess.stdout.on("data", (data) => {
-      // console.log(`stdout: ${data}`);
+
       datas += data;
     });
 
@@ -26,7 +22,7 @@ function runPythonScript(pair) {
     });
 
     pythonProcess.on("close", (code) => {
-      // console.log(`child process exited with code ${code}`);
+
       if (code === 0) {
         resolve(datas); // Resolve the promise with datas value
       } else {

@@ -4,7 +4,7 @@ function getATRStopLossLevels(
   low,
   length = 14,
   smoothing = "RMA",
-  m = 1.2
+  m = 1.5
 ) {
   function rma(source, length) {
     let sum = 0.0;

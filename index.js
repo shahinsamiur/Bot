@@ -7,6 +7,10 @@ const DotEnv = require("dotenv").config();
 const DB_Pass = process.env.DB_Pass;
 const DB_UserName = process.env.DB_UserName;
 const Port = process.env.Port || 404;
+const fs = require("fs");
+const cors = require("cors");
+const dd=require("./Bot/PDB/signal.json")
+
 // console.log(`mongodb+srv://${DB_UserName}:${DB_Pass}@cluster0.4d1qqmy.mongodb.net/?retryWrites=true&w=majority`)
 // mongoose.set("strictQuery", false);
 // mongoose
@@ -22,8 +26,14 @@ const Port = process.env.Port || 404;
 
 app.use(router);
 app.use(express.json());
+const corsOptions = { 
+  // origin:'https://abc.onrender.com',
+  AccessControlAllowOrigin: '*',  
+  origin: '*',  
+  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE' 
+}
+app.use(cors())
 
-// strategy();
 setInterval(()=>{
     var date =new Date()
     var time =date.getMinutes()
@@ -37,8 +47,25 @@ if(getSec==5){
     // strategy(3)
 }
 
+//&&minute.includes(time-1)
+if(getSec==30){
+  const clearSignal=JSON.stringify([])
+  fs.writeFileSync("./Bot/PDB/signal.json", clearSignal);
+
+
+}
+
+
+
 },1000)
 
 app.listen(Port, () => {
-  console.log("our server is runing ");
+  console.log("our server is runing ",Port);
 });
+
+
+
+
+
+
+

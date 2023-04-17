@@ -1,10 +1,10 @@
 
 const fs=require('fs')
 const check_Close_Trade = (high , low ,SL,TP,type,i) => {
-
+console.log("this is form openTrade function ","  high=",high , "  low=",low ,"  SL=",SL,"  TP=",TP,"   type=",type,"   i=",i)
 
 // we are getting data from PDM to modify openTrade.json
-    const is_Open_Trade_Raw = fs.readFileSync("../Bot/PDB/openTrade.json", "utf8");
+    const is_Open_Trade_Raw = fs.readFileSync("./Bot/PDB/openTrade.json", "utf8");
     const is_Open_Trade_Json = JSON.parse(is_Open_Trade_Raw);
 
     var New_Json=is_Open_Trade_Json
@@ -16,7 +16,7 @@ if(type=="buy"){
         New_Json[i].SL=""
         New_Json[i].TP=""
         New_Json[i].type=""
-        fs.writeFileSync("../Bot/PDB/openTrade.json", New_Json);
+        fs.writeFileSync("./Bot/PDB/openTrade.json", New_Json);
         return true
     }else{
    // logic for Trade open so we return continue 
@@ -30,7 +30,8 @@ if(type=="buy"){
         New_Json[i].SL=""
         New_Json[i].TP=""
         New_Json[i].type=""
-        fs.writeFileSync("../Bot/PDB/openTrade.json", New_Json);
+
+        fs.writeFileSync("./Bot/PDB/openTrade.json", JSON.stringify(New_Json));
 
 
         return true
@@ -44,4 +45,5 @@ if(type=="buy"){
 
 };
 
+// check_Close_Trade()
 module.exports = check_Close_Trade;
