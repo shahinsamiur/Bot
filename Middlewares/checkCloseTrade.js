@@ -1,7 +1,6 @@
 
 const fs=require('fs')
 const check_Close_Trade = (high , low ,SL,TP,type,i) => {
-console.log("this is form openTrade function ","  high=",high , "  low=",low ,"  SL=",SL,"  TP=",TP,"   type=",type,"   i=",i)
 
 // we are getting data from PDM to modify openTrade.json
     const is_Open_Trade_Raw = fs.readFileSync("./Bot/PDB/openTrade.json", "utf8");

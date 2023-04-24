@@ -41,23 +41,24 @@ setInterval(()=>{
 var minute=[0,15,30,45]
 
 // console.log(getSec)
-if(getSec==5){
+// if(getSec==5){
  console.log(time)
     strategy()
     // strategy(3)
-}
+// }
 
 //&&minute.includes(time-1)
-if(getSec==30){
-  const clearSignal=JSON.stringify([])
-  fs.writeFileSync("./Bot/PDB/signal.json", clearSignal);
+
+// if(getSec==30){
+//   const clearSignal=JSON.stringify([])
+//   fs.writeFileSync("./Bot/PDB/signal.json", clearSignal);
 
 
-}
+// }
 
 
 
-},1000)
+},10000)
 
 app.listen(Port, () => {
   console.log("our server is runing ",Port);

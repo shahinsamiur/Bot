@@ -6,7 +6,7 @@ const LotCalculate=require("./Bot/LotCalculate")// this function calculate lot d
 const fs = require("fs");
 const pythoncallfunc = require("./Middlewares/pythoncallfunc");// this function call "data.py" for candle data  
 const checkCloseTrade = require("./Middlewares/checkCloseTrade");// this function chack is opend trade close or not 
-
+const sma=require("./Middlewares/sma")
 
 
 
@@ -17,7 +17,7 @@ const Strategy = async () => {
   var candleDataRaw;
 
 
-  for (i = 4; i < pairs.length; i++) { // runing  a loop on pairs 
+  for (i = 0; i < pairs.length-4; i++) { // runing  a loop on pairs 
     try {
 // we are getting candle data using python libery "Tvdatafeed" 
 
@@ -35,7 +35,22 @@ const Strategy = async () => {
   // calling here ema function for calculate ema , using node.js libery "technicalindicators"
       const EMA21 = await ema(output.close, 21);
       const EMA50 = await ema(output.close, 50);
-   
+   console.log("EMA21",EMA21)
+   console.log("EMA50",EMA50)
+
+
+//    SLandTP = AtrStopLossAndTakeProfit(
+//     output.close,
+//     output.high,
+//     output.low,
+//     14,// pried 
+//     "RMA",// type 
+//     1.50 // multiplyer 
+//   );
+// console.log("SLandTP",SLandTP)
+
+
+
 
 
 // here we are getting data from PDB to check if in that pair any trade is running or not 
@@ -73,7 +88,7 @@ console.log("isOpenTradeJson",isOpenTradeJson)
         PrevTrand[i].treand != "sideways"
       ) {
 
-        console.log("from else")
+        console.log("from if")
         var TrendData = PrevTrand;
         
 // here we are updating trend of that pair 
@@ -84,7 +99,7 @@ console.log("isOpenTradeJson",isOpenTradeJson)
 
    // we set a logic here to check any trade is open or not in that pair 
    if (isOpenTradeJson[i].isTradeOpen) {
-
+    console.log("we are going to check open trade  here ")  
     const check_Close_Trade_Result=checkCloseTrade(output.high[output.high.length-1],
       output.low[output.low.length-1],
       isOpenTradeJson[i].SL,
@@ -97,8 +112,10 @@ console.log("isOpenTradeJson",isOpenTradeJson)
 // it gives us true if there is no trade open otherwise  false 
 
 // if function returns false that means trade open in that pair so here skiping the loop by "continue" 
-console.log("we are going to continue here ")       
-if(!check_Close_Trade_Result) continue
+     
+if(!check_Close_Trade_Result){
+  console.log("we are going to continue ",check_Close_Trade_Result)
+  continue}
     }
 
 
@@ -108,24 +125,23 @@ if(!check_Close_Trade_Result) continue
 
 
 // now we are checking higher timeframe for open trade and calculating ema 
-        const EMA211H = await ema(output.close1H, 21);
-        const EMA501H = await ema(output.close1H, 50);
-      
-        var trend1H = "";// that variable store higher timeframe trend 
-
+           const SMA100= await sma(output.close, 100)
+      console.log("sma 100==",SMA100)
+   
+var is_trade=false
 // here we set a logic for findout the trend of higher timeframe 
-        if (EMA211H[0] > EMA211H[1] && EMA211H[0] > EMA501H[0]) {
-          trend1H = "up";
-        } else if (EMA211H[0] < EMA211H[1] && EMA211H[0] < EMA501H[0]) {
-          trend1H = "down";
+        if (trend= "up"&&EMA21[0]>=SMA100[0]) {
+          is_trade=true
+        } else if (trend= "down"&&EMA21[0]<=SMA100[0]) {
+          is_trade=true
         } else {
-          trend1H = "sideways";
+          is_trade=false
         }
 
-
+console.log("is_trade",is_trade)
 
 // finally we are checking that if higher timeframe trend is sweetable for opening trade  
-        if (trend1H == "sideways" || trend1H == trend) {
+        if (is_trade) {
 
 // now calculating stop loss point 
           SLandTP = AtrStopLossAndTakeProfit(
@@ -134,7 +150,7 @@ if(!check_Close_Trade_Result) continue
             output.low,
             14,// pried 
             "RMA",// type 
-            1.69 // multiplyer 
+            1 // multiplyer 
           );
   
 
@@ -153,20 +169,20 @@ const LotSize = await LotCalculate(
           SLandTP,
           trend
         );
-        var time=new Date().getMinutes()
-        console.log(time)
+        
+     
         console.log(LotSize);
         
 
 // here we are checking if it returns data then we mail users or we will open trade here 
         if (LotSize) {
-          await MakeEmail(
-            pairs[i],
-            trend,
-            LotSize.SL,
-            LotSize.TP,
-            output.close[output.close.length - 1], );
-
+          // await MakeEmail(
+          //   pairs[i],
+          //   trend,
+          //   LotSize.SL,
+          //   LotSize.TP,
+          //   output.close[output.close.length - 1], );
+console.warn("mail send ")
 
 
       var signal={
@@ -221,7 +237,7 @@ const openTradeData = fs.readFileSync("./Bot/PDB/openTrade.json", "utf8");
 
       } 
       else {
- console.log("from else")
+ console.log("from else sure ")
 // checking here for any open trade is closed or not 
 
         checkCloseTrade(output.high[output.high.length-1],

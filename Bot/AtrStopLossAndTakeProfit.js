@@ -72,8 +72,8 @@ function getATRStopLossLevels(
   };
 
   const result = {
-    long: output.long.split(",").map(Number),
-    short: output.short.split(",").map(Number),
+    long: output.long.split(",").map(Number).slice(-10),
+    short: output.short.split(",").map(Number).slice(-10),
   };
 
   return result;

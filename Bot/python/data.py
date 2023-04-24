@@ -4,7 +4,7 @@ import numpy as np
 import json
 import sys
 arg1 = sys.argv[1]
-
+# arg1="EURUSD"
 def greet():
 
     username = 'shahinsamiur'
@@ -13,8 +13,8 @@ def greet():
 
     #here we are getting data form treading view  
     tv = TvDatafeed()
-    data = tv.get_hist(symbol=arg1, exchange='OANDA', interval=Interval.in_1_minute, n_bars=72)
-    data1H = tv.get_hist(symbol=arg1, exchange='OANDA', interval=Interval.in_5_minute, n_bars=72)
+    data = tv.get_hist(symbol=arg1, exchange='OANDA', interval=Interval.in_15_minute, n_bars=200)
+    data1H = tv.get_hist(symbol=arg1, exchange='OANDA', interval=Interval.in_1_hour, n_bars=200)
 #1_hour
 # here TvDatafeed gives that in pandas formet so we are here convert it into list or json forment
     close = data.iloc[:, 4].values.tolist()
