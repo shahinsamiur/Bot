@@ -9,7 +9,8 @@ const DB_UserName = process.env.DB_UserName;
 const Port = process.env.Port || 404;
 const fs = require("fs");
 const cors = require("cors");
-const dd=require("./Bot/PDB/signal.json")
+const remove_signal=require("./remve_signal.js")
+
 
 // console.log(`mongodb+srv://${DB_UserName}:${DB_Pass}@cluster0.4d1qqmy.mongodb.net/?retryWrites=true&w=majority`)
 // mongoose.set("strictQuery", false);
@@ -40,25 +41,12 @@ app.use(cors())
     var getSec=date.getSeconds()
 var minute=[0,15,30,45]
 
-// console.log(getSec)
-// if(getSec==5){
- console.log(time)
+if(minute.includes(time+5)&&getSec==5){
+  fs.writeFileSync("./Bot/PDB/signal.json", []);
+}
+
     strategy()
-    // strategy(3)
-// }
 
-//&&minute.includes(time-1)
-
-// if(getSec==30){
-//   const clearSignal=JSON.stringify([])
-//   fs.writeFileSync("./Bot/PDB/signal.json", clearSignal);
-
-
-// }
-
-
-
-// },10000)
 
 app.listen(Port, () => {
   console.log("our server is runing ",Port);

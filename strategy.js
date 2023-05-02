@@ -193,7 +193,7 @@ console.warn("mail send ")
           "Take_profit":Number(LotSize.TP.toFixed(6)),
           "pips":Number(LotSize.pips)
         }
-console.log(signal)
+
         const signal_Data = fs.readFileSync("./Bot/PDB/signal.json", "utf8");
         const Prev_signal = JSON.parse(signal_Data);
         var new_signal=Prev_signal
