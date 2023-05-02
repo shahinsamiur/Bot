@@ -6,18 +6,18 @@ const LotCalculate=require("./Bot/LotCalculate")// this function calculate lot d
 const fs = require("fs");
 const pythoncallfunc = require("./Middlewares/pythoncallfunc");// this function call "data.py" for candle data  
 const checkCloseTrade = require("./Middlewares/checkCloseTrade");// this function chack is opend trade close or not 
-const sma=require("./Middlewares/sma")
+const EMA_100=require("./Middlewares/100EMA")
 
 
 
 const Strategy = async () => {
-  var pairs = ["EURUSD", "USDJPY", "GBPUSD", "AUDUSD", "USDCAD"]; // this pair need for getting candle data 
+  var pairs = ["EURUSD", "AUDUSD", "USDCAD"]; // this pair need for getting candle data 
   var trend = "";
   var SLandTP = {};
   var candleDataRaw;
+var is_trade=false
 
-
-  for (i = 0; i < pairs.length-4; i++) { // runing  a loop on pairs 
+  for (i = 0; i < pairs.length-2; i++) { // runing  a loop on pairs 
     try {
 // we are getting candle data using python libery "Tvdatafeed" 
 
@@ -39,15 +39,15 @@ const Strategy = async () => {
    console.log("EMA50",EMA50)
 
 
-//    SLandTP = AtrStopLossAndTakeProfit(
-//     output.close,
-//     output.high,
-//     output.low,
-//     14,// pried 
-//     "RMA",// type 
-//     1.50 // multiplyer 
-//   );
-// console.log("SLandTP",SLandTP)
+   SLandTP = AtrStopLossAndTakeProfit(
+    output.close,
+    output.high,
+    output.low,
+    14,// pried 
+    "RMA",// type 
+    1.00 // multiplyer 
+  );
+console.log("SLandTP",SLandTP)
 
 
 
@@ -56,7 +56,7 @@ const Strategy = async () => {
 // here we are getting data from PDB to check if in that pair any trade is running or not 
       const isOpenTradeRaw = fs.readFileSync("./Bot/PDB/openTrade.json", "utf8");
       const isOpenTradeJson = JSON.parse(isOpenTradeRaw);
-console.log("isOpenTradeJson",isOpenTradeJson)
+
 
 
 
@@ -73,7 +73,7 @@ console.log("isOpenTradeJson",isOpenTradeJson)
         trend = "sideways";
      
       }
-
+    
 
       // here we are getting data from  PBD  to check if market trand is same as previous treand 
       const jsonData = fs.readFileSync("./Bot/PDB/treand.json", "utf8");
@@ -87,7 +87,7 @@ console.log("isOpenTradeJson",isOpenTradeJson)
         PrevTrand[i].treand != trend &&
         PrevTrand[i].treand != "sideways"
       ) {
-
+       
         console.log("from if")
         var TrendData = PrevTrand;
         
@@ -112,7 +112,7 @@ console.log("isOpenTradeJson",isOpenTradeJson)
 // it gives us true if there is no trade open otherwise  false 
 
 // if function returns false that means trade open in that pair so here skiping the loop by "continue" 
-     
+
 if(!check_Close_Trade_Result){
   console.log("we are going to continue ",check_Close_Trade_Result)
   continue}
@@ -125,20 +125,21 @@ if(!check_Close_Trade_Result){
 
 
 // now we are checking higher timeframe for open trade and calculating ema 
-           const SMA100= await sma(output.close, 100)
-      console.log("sma 100==",SMA100)
+           const EMA_100_Data= await EMA_100(output.close, 100)
+      console.log("EMA_100 100==",EMA_100_Data)
    
-var is_trade=false
-// here we set a logic for findout the trend of higher timeframe 
-        if (trend= "up"&&EMA21[0]>=SMA100[0]) {
+
+// here we set a logic for findout the trend of higher timeframe
+
+        if (trend== "up"&&EMA21[0]>=EMA_100_Data[0]) {
           is_trade=true
-        } else if (trend= "down"&&EMA21[0]<=SMA100[0]) {
+        } else if (trend== "down"&&EMA21[0]<=EMA_100_Data[0]) {
           is_trade=true
         } else {
           is_trade=false
         }
 
-console.log("is_trade",is_trade)
+
 
 // finally we are checking that if higher timeframe trend is sweetable for opening trade  
         if (is_trade) {
@@ -172,7 +173,7 @@ const LotSize = await LotCalculate(
         
      
         console.log(LotSize);
-        
+    
 
 // here we are checking if it returns data then we mail users or we will open trade here 
         if (LotSize) {
@@ -188,10 +189,11 @@ console.warn("mail send ")
       var signal={
           "pair":pairs[i],
           "side":trend,
-          "stop_loss": LotSize.SL,
-          "Take_profit":LotSize.TP
+          "stop_loss": Number(LotSize.SL.toFixed(6)),
+          "Take_profit":Number(LotSize.TP.toFixed(6)),
+          "pips":Number(LotSize.pips)
         }
-
+console.log(signal)
         const signal_Data = fs.readFileSync("./Bot/PDB/signal.json", "utf8");
         const Prev_signal = JSON.parse(signal_Data);
         var new_signal=Prev_signal
@@ -210,7 +212,6 @@ const openTradeData = fs.readFileSync("./Bot/PDB/openTrade.json", "utf8");
         var final_openTrade=JSON.stringify(openTradeDataJson)
         fs.writeFileSync("./Bot/PDB/openTrade.json", final_openTrade);
 
-   
 
 
         }  }
@@ -225,7 +226,7 @@ const openTradeData = fs.readFileSync("./Bot/PDB/openTrade.json", "utf8");
         PrevTrand != {} &&
         PrevTrand[i].treand != trend
       ) {
-
+  
   // In this block , if trand change but we are not going to open trade so we come here ...
         var TrendData = PrevTrand;
         console.log(TrendData[i], "trendData","if else");
@@ -238,6 +239,7 @@ const openTradeData = fs.readFileSync("./Bot/PDB/openTrade.json", "utf8");
       } 
       else {
  console.log("from else sure ")
+
 // checking here for any open trade is closed or not 
 
         checkCloseTrade(output.high[output.high.length-1],

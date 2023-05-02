@@ -34,7 +34,7 @@ const corsOptions = {
 }
 app.use(cors())
 
-setInterval(()=>{
+// setInterval(()=>{
     var date =new Date()
     var time =date.getMinutes()
     var getSec=date.getSeconds()
@@ -58,7 +58,7 @@ var minute=[0,15,30,45]
 
 
 
-},10000)
+// },10000)
 
 app.listen(Port, () => {
   console.log("our server is runing ",Port);

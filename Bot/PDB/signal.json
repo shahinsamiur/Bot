@@ -1,1 +1,15 @@
-[{"pair":"EURUSD","side":true,"stop_loss":"1.099484","Take_profit":1.0974314285714286}]
+[
+  {
+    "pair": "EURUSD",
+    "side": "up",
+    "stop_loss": 0.662019,
+    "Take_profit": 0.665923,
+    "pips": 9
+  }, {
+    "pair": "AUDUSD",
+    "side": "down",
+    "stop_loss": 0.662019,
+    "Take_profit": 0.665923,
+    "pips": 18
+  }
+]

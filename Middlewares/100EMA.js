@@ -7,7 +7,7 @@ async function calculateEMA(price, periodof) {
   };
 
   // Calculate the EMA using technicalindicators library
-  const resultEMA = technicalIndicators.SMA.calculate(inputEMA);
+  const resultEMA = technicalIndicators.EMA.calculate(inputEMA);
   //   var newArr=resultEMA.slice(-20)
   // return newArr;
 
