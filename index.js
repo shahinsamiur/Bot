@@ -41,9 +41,9 @@ app.use(cors())
     var getSec=date.getSeconds()
 var minute=[0,15,30,45]
 
-if(minute.includes(time+5)&&getSec==5){
-  fs.writeFileSync("./Bot/PDB/signal.json", []);
-}
+// if(minute.includes(time+5)&&getSec==5){
+//   fs.writeFileSync("./Bot/PDB/signal.json", []);
+// }
 
     strategy()
 

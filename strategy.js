@@ -35,20 +35,8 @@ var is_trade=false
   // calling here ema function for calculate ema , using node.js libery "technicalindicators"
       const EMA21 = await ema(output.close, 21);
       const EMA50 = await ema(output.close, 50);
-   console.log("EMA21",EMA21)
-   console.log("EMA50",EMA50)
-
-
-   SLandTP = AtrStopLossAndTakeProfit(
-    output.close,
-    output.high,
-    output.low,
-    14,// pried 
-    "RMA",// type 
-    1.00 // multiplyer 
-  );
-console.log("SLandTP",SLandTP)
-
+  //  console.log("EMA21",EMA21)
+  //  console.log("EMA50",EMA50)
 
 
 
@@ -88,7 +76,7 @@ console.log("SLandTP",SLandTP)
         PrevTrand[i].treand != "sideways"
       ) {
        
-        console.log("from if")
+        // console.log("from if")
         var TrendData = PrevTrand;
         
 // here we are updating trend of that pair 
@@ -121,19 +109,26 @@ if(!check_Close_Trade_Result){
 
 
 
-
-
-
 // now we are checking higher timeframe for open trade and calculating ema 
            const EMA_100_Data= await EMA_100(output.close, 100)
-      console.log("EMA_100 100==",EMA_100_Data)
-   
+      // console.log("EMA_100 100==",EMA_100_Data)
+
+
+// now calculating stop loss point 
+      SLandTP = AtrStopLossAndTakeProfit(
+        output.close,
+        output.high,
+        output.low,
+        14,// pried 
+        "RMA",// type 
+        1 // multiplyer 
+      );
 
 // here we set a logic for findout the trend of higher timeframe
 
-        if (trend== "up"&&EMA21[0]>=EMA_100_Data[0]) {
+        if (trend== "up"&&output.close[output.length-1]>EMA_100_Data[0]&&SLandTP.long[SLandTP.long-1]<EMA_100_Data[0]) {
           is_trade=true
-        } else if (trend== "down"&&EMA21[0]<=EMA_100_Data[0]) {
+        } else if (trend== "down"&&output.close[output.length-1]<EMA_100_Data[0]&&SLandTP.short[SLandTP.short-1]>EMA_100_Data[0]) {
           is_trade=true
         } else {
           is_trade=false
@@ -143,23 +138,6 @@ if(!check_Close_Trade_Result){
 
 // finally we are checking that if higher timeframe trend is sweetable for opening trade  
         if (is_trade) {
-
-// now calculating stop loss point 
-          SLandTP = AtrStopLossAndTakeProfit(
-            output.close,
-            output.high,
-            output.low,
-            14,// pried 
-            "RMA",// type 
-            1 // multiplyer 
-          );
-  
-
-
-
-// here we are calculating lot size considering stop loss , it just for testing perpose
-        var userBlance=100;
-
 
 
 // here we are calculating lot size . and the "LotCalculate" function gives us stop_loss as SL , take_profit as TP and lotsize 
@@ -177,13 +155,13 @@ const LotSize = await LotCalculate(
 
 // here we are checking if it returns data then we mail users or we will open trade here 
         if (LotSize) {
-          // await MakeEmail(
-          //   pairs[i],
-          //   trend,
-          //   LotSize.SL,
-          //   LotSize.TP,
-          //   output.close[output.close.length - 1], );
-console.warn("mail send ")
+          await MakeEmail(
+            pairs[i],
+            trend,
+            LotSize.SL,
+            LotSize.TP,
+            output.close[output.close.length - 1], );
+// console.warn("mail send ")
 
 
       var signal={
@@ -229,7 +207,7 @@ const openTradeData = fs.readFileSync("./Bot/PDB/openTrade.json", "utf8");
   
   // In this block , if trand change but we are not going to open trade so we come here ...
         var TrendData = PrevTrand;
-        console.log(TrendData[i], "trendData","if else");
+        // console.log(TrendData[i], "trendData","if else");
         TrendData[i].treand = trend;
 
         // here updating treand.json file 
