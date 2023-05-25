@@ -196,7 +196,14 @@ const LotSize = await LotCalculate(
 
 
 // here we are updating "openTrade.json" file which is prevent to open a trade if trade open in that pair 
-
+const openTradeData = fs.readFileSync("./Bot/PDB/openTrade.json", "utf8");
+        const openTradeDataJson = JSON.parse(openTradeData);
+        openTradeDataJson[i].isTradeOpen=true
+        openTradeDataJson[i].SL=LotSize.SL
+        openTradeDataJson[i].TP=LotSize.TP
+        openTradeDataJson[i].type=trend
+        var final_openTrade=JSON.stringify(openTradeDataJson)
+        fs.writeFileSync("./Bot/PDB/openTrade.json", final_openTrade);
 
 
 
