@@ -36,16 +36,25 @@ const corsOptions = {
 app.use(cors())
 
 // setInterval(()=>{
-    var date =new Date()
-    var time =date.getMinutes()
-    var getSec=date.getSeconds()
-var minute=[0,15,30,45]
+//     var date =new Date()
+//     var time =date.getMinutes()
+//     var getSec=date.getSeconds()
+// var minute=[0,15,30,45]
+// if(getSec==5){
+// console.log("minute :",time," sec :",getSec)
 
-// if(minute.includes(time+5)&&getSec==5){
-//   fs.writeFileSync("./Bot/PDB/signal.json", []);
+
+// }
+strategy()
+// if(getSec==35){
+// var strData=JSON.stringify([])
+//   fs.writeFileSync("./Bot/PDB/signal.json",strData );
 // }
 
-    strategy()
+
+// },1000)
+
+
 
 
 app.listen(Port, () => {

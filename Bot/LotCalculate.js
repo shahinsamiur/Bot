@@ -1,48 +1,35 @@
 
-const LotCalculate=async(userBlance,currentPrice,SLandTP,signal)=>{
-
-    var riskAmount=userBlance/50
+const LotCalculate=async(currentPrice,SLandTP,signal)=>{
+ 
  
     //pips calculation 
-    var pips=0
-    var riskPrice=0
+    var pips=16
+    // var riskPrice=0
     var TP=0
     var SL=0
     if (signal=="up") {
-        riskPrice= (currentPrice-SLandTP.short[SLandTP.short.length-1])
-        SL=SLandTP.short[SLandTP.short.length-1]
-
-        TP=currentPrice+(riskPrice*2)
-        pips=(Math.abs(( SLandTP.short[SLandTP.short.length-1]-currentPrice)/0.0001)).toFixed(2)
-    
-    //  pips=Math.round((currentPrice-riskPrice)/ 0.0001)
+        riskPrice= (currentPrice-SLandTP.short[SLandTP.short.length-2])
+        SL=SLandTP.short[SLandTP.short.length-1].toFixed(6)
+        pips=(Math.abs(( SLandTP.short[SLandTP.long.length-2]-currentPrice)/0.0001)).toFixed(2)
+        TP=(currentPrice+(riskPrice*2)).toFixed(6)
+   
     } else {
-        riskPrice= SLandTP.long[SLandTP.long.length-1]-currentPrice
-        // console.log(riskPrice)
-        SL=SLandTP.long[SLandTP.long.length-1].toFixed(6)
-        TP=currentPrice-(riskPrice*2)
-        pips=(Math.abs(( SLandTP.long[SLandTP.long.length-1]-currentPrice)/0.0001)).toFixed(2)
+        riskPrice= (currentPrice-SLandTP.long[SLandTP.short.length-2])
+        SL=SLandTP.long[SLandTP.long.length-2].toFixed(6)
+        TP=(currentPrice-(riskPrice*2)).toFixed(6)
+        pips=(Math.abs(( SLandTP.long[SLandTP.long.length-2]-currentPrice)/0.0001)).toFixed(2)
     }
     
-    if(pips>=20){
+    if(pips>=20&&pips<5){
         console.log(pips)
         return false
     }
-    // lot size calculation 
-    var lotSize=(riskAmount/(pips*10)).toFixed(2)
-    
-    
-    
-    // console.log(lotSize)
-    
-    if(lotSize>=0.01){
-        console.log(pips,"lotSize---",lotSize)
+ 
         
         return {
-            lotSize,TP,pips,SL
+        TP,pips,SL
         }
-    }
-    // console.log(lotSize)
+
     return false
     }
 

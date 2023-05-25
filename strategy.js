@@ -7,23 +7,24 @@ const fs = require("fs");
 const pythoncallfunc = require("./Middlewares/pythoncallfunc");// this function call "data.py" for candle data  
 const checkCloseTrade = require("./Middlewares/checkCloseTrade");// this function chack is opend trade close or not 
 const EMA_100=require("./Middlewares/100EMA")
-
+const py_call_fun_openTrade=require("./Middlewares/py_call_fun_openTrade.js");
 
 
 const Strategy = async () => {
-  var pairs = ["EURUSD", "AUDUSD", "USDCAD"]; // this pair need for getting candle data 
+  var pairs = ["EURUSD","GBPUSD","AUDUSD","USDJPY","USDCAD"]; // this pair need for getting candle data 
   var trend = "";
   var SLandTP = {};
   var candleDataRaw;
 var is_trade=false
 
-  for (i = 0; i < pairs.length-2; i++) { // runing  a loop on pairs 
+  for (i = 0; i < pairs.length; i++) { // runing  a loop on pairs 
     try {
 // we are getting candle data using python libery "Tvdatafeed" 
 
       candleDataRaw = await pythoncallfunc(pairs[i]);
       var output = await JSON.parse(candleDataRaw);
-  // console.log(output)
+   
+  // console.log("current price :",output.close[output.close.length-1])
 
 
 
@@ -35,10 +36,19 @@ var is_trade=false
   // calling here ema function for calculate ema , using node.js libery "technicalindicators"
       const EMA21 = await ema(output.close, 21);
       const EMA50 = await ema(output.close, 50);
+   
   //  console.log("EMA21",EMA21)
   //  console.log("EMA50",EMA50)
 
-
+//    SLandTP = AtrStopLossAndTakeProfit(
+//     output.close,
+//     output.high,
+//     output.low,
+//     14,// pried 
+//     "RMA",// type 
+//     0.88 // multiplyer 
+//   );
+// console.log(SLandTP)
 
 
 // here we are getting data from PDB to check if in that pair any trade is running or not 
@@ -110,7 +120,8 @@ if(!check_Close_Trade_Result){
 
 
 // now we are checking higher timeframe for open trade and calculating ema 
-           const EMA_100_Data= await EMA_100(output.close, 100)
+          //  const EMA_100_Data= await EMA_100(output.close, 100)
+        
       // console.log("EMA_100 100==",EMA_100_Data)
 
 
@@ -121,29 +132,32 @@ if(!check_Close_Trade_Result){
         output.low,
         14,// pried 
         "RMA",// type 
-        1 // multiplyer 
+        1.5 // multiplyer 
       );
 
 // here we set a logic for findout the trend of higher timeframe
 
-        if (trend== "up"&&output.close[output.length-1]>EMA_100_Data[0]&&SLandTP.long[SLandTP.long-1]<EMA_100_Data[0]) {
-          is_trade=true
-        } else if (trend== "down"&&output.close[output.length-1]<EMA_100_Data[0]&&SLandTP.short[SLandTP.short-1]>EMA_100_Data[0]) {
-          is_trade=true
-        } else {
-          is_trade=false
-        }
+        // if (trend== "up"&&output.close[output.close.length-1]>=EMA_100_Data[0]&&SLandTP.short[SLandTP.short.length-1]<EMA_100_Data[0]) {
+        //   console.log("logic if ")
+        //   is_trade=true
+        // } else if (trend== "down"&&output.close[output.close.length-1]<=EMA_100_Data[0]&&SLandTP.long[SLandTP.long.length-1]>=EMA_100_Data[0]) {
+        //   is_trade=true
+        //   console.log("logic else if ")
+        // } else {
+        //   is_trade=false
+        //   console.log("logic else ")
+        //   console.log("current price=",output.close[output.close.length-1]," trend= ",trend," EMA_100= ",EMA_100_Data[0]," short= ",SLandTP.short[SLandTP.short.length-1]," long= ",SLandTP.long[SLandTP.long.length-1])
+        // }
 
 
 
 // finally we are checking that if higher timeframe trend is sweetable for opening trade  
-        if (is_trade) {
+        // if (is_trade) {
 
 
 // here we are calculating lot size . and the "LotCalculate" function gives us stop_loss as SL , take_profit as TP and lotsize 
 // else if the position not satisfied , that mean if sl size is more then set pips then it retuns "false"
 const LotSize = await LotCalculate(
-          userBlance,
           output.close[output.close.length - 1],
           SLandTP,
           trend
@@ -151,7 +165,22 @@ const LotSize = await LotCalculate(
         
      
         console.log(LotSize);
-    
+    if(LotSize){
+      py_call_fun_openTrade(trend,LotSize.SL,output.close[output.close.length - 1], pairs[i])
+    }
+//************************************************* */
+
+
+
+
+
+
+
+
+
+
+
+
 
 // here we are checking if it returns data then we mail users or we will open trade here 
         if (LotSize) {
@@ -164,35 +193,16 @@ const LotSize = await LotCalculate(
 // console.warn("mail send ")
 
 
-      var signal={
-          "pair":pairs[i],
-          "side":trend,
-          "stop_loss": Number(LotSize.SL.toFixed(6)),
-          "Take_profit":Number(LotSize.TP.toFixed(6)),
-          "pips":Number(LotSize.pips)
-        }
 
-        const signal_Data = fs.readFileSync("./Bot/PDB/signal.json", "utf8");
-        const Prev_signal = JSON.parse(signal_Data);
-        var new_signal=Prev_signal
-        new_signal.push(signal)
-       var final=JSON.stringify(new_signal)
-        fs.writeFileSync("./Bot/PDB/signal.json", final);
 
 // here we are updating "openTrade.json" file which is prevent to open a trade if trade open in that pair 
 
-const openTradeData = fs.readFileSync("./Bot/PDB/openTrade.json", "utf8");
-        const openTradeDataJson = JSON.parse(openTradeData);
-        openTradeDataJson[i].isTradeOpen=true
-        openTradeDataJson[i].SL=LotSize.SL
-        openTradeDataJson[i].TP=LotSize.TP
-        openTradeDataJson[i].type=trend
-        var final_openTrade=JSON.stringify(openTradeDataJson)
-        fs.writeFileSync("./Bot/PDB/openTrade.json", final_openTrade);
 
 
 
-        }  }
+
+        }  
+      // }
 
 
   
